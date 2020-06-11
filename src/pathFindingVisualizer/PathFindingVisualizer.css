@@ -1,0 +1,8 @@
+.path-finding {
+    display: flex;
+    flex-direction: row;
+}
+
+.title {
+    width: 100%;
+}
