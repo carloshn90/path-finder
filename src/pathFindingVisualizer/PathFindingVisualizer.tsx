@@ -4,6 +4,9 @@ import {Board} from "./board/Board";
 import {ToolPanel} from "./tools/ToolPanel";
 import {ActionEnum} from "../share/enum/ActionEnum";
 import {Point} from "../share/model/Point";
+import {TreeNode} from "../share/model/TreeNode";
+import {TreeUtil} from "../share/util/TreeUtil";
+import { isNil } from "lodash";
 
 export interface IPathFindingVisualizerProps {}
 export interface IPathFindingVisualizerState {
@@ -106,6 +109,16 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
         return actionMatrix;
     }
 
+    private createTree = (): void => {
+
+        const initPosition: Point | null = this.state.startPosition;
+        if (!isNil(initPosition)) {
+            const treeUtil: TreeUtil = new TreeUtil();
+            const treeNodeArray: Array<TreeNode> = treeUtil.matrixToTree(this.state.actionMatrix, initPosition);
+            console.log(treeNodeArray)
+        }
+    }
+
     render = (): ReactElement => {
         return (
             <div className="container">
@@ -121,6 +134,7 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
                                 <div className="row">
                                     <ToolPanel
                                         onAction={(action: ActionEnum) => this.setActionState(action)}
+                                        onPlay={() => this.createTree()}
                                     >
                                     </ToolPanel>
                                 </div>

@@ -1,11 +1,12 @@
 import React, {Component, ReactElement} from "react";
 import "./ToolPanel.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowRight, faBullseye, faEraser, faPencilAlt} from "@fortawesome/free-solid-svg-icons";
+import {faArrowRight, faBullseye, faEraser, faPencilAlt, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {ActionEnum} from "../../share/enum/ActionEnum";
 
 export interface IToolPanelProps {
-    onAction: (action: ActionEnum) => void
+    onAction: (action: ActionEnum) => void;
+    onPlay: () => void;
 }
 
 export class ToolPanel extends Component<IToolPanelProps, {}> {
@@ -54,6 +55,15 @@ export class ToolPanel extends Component<IToolPanelProps, {}> {
                             >
                                 <FontAwesomeIcon icon={faBullseye}/>
                                 <span>end</span>
+                            </button>
+                        </div>
+
+                        <div className="col-2">
+                            <button className="btn btn-outline-secondary"
+                                    onClick={() => this.props.onPlay()}
+                            >
+                                <FontAwesomeIcon icon={faPlay}/>
+                                <span>play</span>
                             </button>
                         </div>
                     </div>
