@@ -2,32 +2,37 @@ import {TreeNode} from "../../model/TreeNode";
 import { isNil, isEmpty } from "lodash";
 import {DijkstraModel} from "../../model/DijkstraModel";
 import {Point} from "../../model/Point";
+import {DijkstraResultModel} from "../../model/DijkstraResultModel";
 
 export class Dijkstra {
 
     visited: Set<string>;
-    dijkstraModelArray: Array<DijkstraModel>
+    dijkstraModelArray: Array<DijkstraModel>;
 
     constructor() {
         this.visited = new Set<string>();
         this.dijkstraModelArray = [];
     }
 
-    calculateShorterPath = (treeNodeArray: Array<TreeNode>): Array<Point> | null => {
+    calculateShorterPath = (treeNodeArray: Array<TreeNode>): DijkstraResultModel => {
 
         let currentNode: TreeNode | null = treeNodeArray[0];
 
+
         do {
             this.visited.add(Dijkstra.createNodeKey(currentNode));
-            const currentDijkstra: DijkstraModel = new DijkstraModel(currentNode, null, 0);
+            const distant: number = isNil(currentNode.distant) ? 0 : currentNode.distant;
+            const currentDijkstra: DijkstraModel = new DijkstraModel(currentNode, null, distant);
             this.dijkstraModelArray.push(currentDijkstra);
             this.iterateChild(currentDijkstra);
             currentNode = this.getNextNotVisitedNode();
         } while (!isNil(currentNode) && !currentNode.isEnd);
 
-        if (isNil(currentNode)) return null;
+        if (isNil(currentNode)) return new DijkstraResultModel([], []);
 
-        return this.createPath(currentNode);
+        const path: Array<Point> = this.createPath(currentNode).reverse();
+
+        return new DijkstraResultModel(this.dijkstraModelArray, path);
     }
 
     private iterateChild = (currentDijkstra: DijkstraModel) => {
@@ -36,6 +41,7 @@ export class Dijkstra {
 
         for (let childTreeNode of currentNode.childArray) {
             if (!this.hasVisited(childTreeNode)) {
+                console.log('current distant: ', currentDijkstra.distant);
                 childTreeNode.distant = currentDijkstra.distant + 1;
                 this.updateDijkstraModelArray(childTreeNode, currentNode, childTreeNode.distant);
             }

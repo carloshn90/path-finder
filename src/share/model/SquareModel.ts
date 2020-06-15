@@ -3,18 +3,18 @@ import {ActionEnum} from "../enum/ActionEnum";
 export class SquareModel {
 
     private readonly _action: ActionEnum;
-    private readonly _isPath: boolean;
+    private readonly _nodeColor: string | null;
 
-    constructor(action: ActionEnum, isPath: boolean) {
+    constructor(action: ActionEnum, nodeColor: string | null) {
         this._action = action;
-        this._isPath = isPath;
+        this._nodeColor = nodeColor;
     }
 
     get action(): ActionEnum {
         return this._action;
     }
 
-    get isPath(): boolean {
-        return this._isPath;
+    get nodeColor(): string | null {
+        return this._nodeColor;
     }
 }

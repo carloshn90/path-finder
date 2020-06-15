@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ActionEnum} from "../../../share/enum/ActionEnum";
 import {Point} from "../../../share/model/Point";
 import {SquareModel} from "../../../share/model/SquareModel";
+import { isNil } from "lodash";
 
 export interface ISquareProps {
     actionSelected: ActionEnum;
@@ -32,7 +33,7 @@ export class Square extends Component<ISquareProps, ISquareState>{
 
     private getBackgroundColor = (): string => {
 
-        if (this.props.squareModel.isPath) return 'orange';
+        if (!isNil(this.props.squareModel.nodeColor)) return this.props.squareModel.nodeColor;
 
         switch (this.props.squareModel.action) {
             case ActionEnum.wall:

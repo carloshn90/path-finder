@@ -9,6 +9,8 @@ import {TreeUtil} from "../share/util/TreeUtil";
 import {isNil} from "lodash";
 import {Dijkstra} from "../share/algorithm/dijkstra/Dijkstra";
 import {SquareModel} from "../share/model/SquareModel";
+import {DijkstraResultModel} from "../share/model/DijkstraResultModel";
+import {DijkstraModel} from "../share/model/DijkstraModel";
 
 export interface IPathFindingVisualizerProps {}
 export interface IPathFindingVisualizerState {
@@ -54,7 +56,7 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
         for (let row = 0; row < numberRows; ++row) {
             const actionColArray: Array<SquareModel> = [];
             for (let col = 0; col < numberCol; ++col) {
-                actionColArray.push(new SquareModel(ActionEnum.none, false));
+                actionColArray.push(new SquareModel(ActionEnum.none, null));
             }
             actionMatrix.push(actionColArray);
         }
@@ -66,7 +68,7 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
 
         const actionMatrixCopy: Array<Array<SquareModel>> = this.cleanActionMatrix(position, this.state.actionSelected);
 
-        actionMatrixCopy[position.col][position.row] = new SquareModel(this.state.actionSelected, false);
+        actionMatrixCopy[position.col][position.row] = new SquareModel(this.state.actionSelected, null);
 
         this.setState({
             actionSelected: this.state.actionSelected,
@@ -94,7 +96,7 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
     private cleanStarPosition = (position: Point, actionMatrix: Array<Array<SquareModel>>): Array<Array<SquareModel>> => {
 
         if (this.state.startPosition !== null)
-            actionMatrix[this.state.startPosition.col][this.state.startPosition.row] = new SquareModel(ActionEnum.none, false);
+            actionMatrix[this.state.startPosition.col][this.state.startPosition.row] = new SquareModel(ActionEnum.none, null);
 
         this.setState({startPosition: position});
 
@@ -104,7 +106,7 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
     private cleanEndPosition = (position: Point, actionMatrix: Array<Array<SquareModel>>): Array<Array<SquareModel>> => {
 
         if (this.state.endPosition !== null)
-            actionMatrix[this.state.endPosition.col][this.state.endPosition.row] = new SquareModel(ActionEnum.none, false);
+            actionMatrix[this.state.endPosition.col][this.state.endPosition.row] = new SquareModel(ActionEnum.none, null);
 
         this.setState({endPosition: position});
 
@@ -116,20 +118,38 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
         const initPosition: Point | null = this.state.startPosition;
         if (!isNil(initPosition)) {
             const treeNodeArray: Array<TreeNode> = new TreeUtil().matrixToTree(this.state.actionMatrix, initPosition);
-            const path: Array<Point> | null = new Dijkstra().calculateShorterPath(treeNodeArray);
-            if (!isNil(path)) {
-                this.paintPath(path);
-            }
+            const dijkstraResultModel: DijkstraResultModel = new Dijkstra().calculateShorterPath(treeNodeArray);
+            this.paintSimulation(dijkstraResultModel.dijkstraStepResults)
+                .then(_ => this.paintPath(dijkstraResultModel.path));
+        }
+    }
+
+    private paintSimulation = async (dijkstraStepResults: Array<DijkstraModel>): Promise<void> => {
+
+        let actionMatrixCopy: Array<Array<SquareModel>> = this.getCleanPathMatrix();
+        const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+        for (let dijkstraModel of dijkstraStepResults) {
+            const currentNode: TreeNode = dijkstraModel.currentNode;
+            const squareModelAux: SquareModel = actionMatrixCopy[currentNode.position.col][currentNode.position.row];
+            actionMatrixCopy[currentNode.position.col][currentNode.position.row] =
+                new SquareModel(squareModelAux.action, PathFindingVisualizer.getColorByDistant(dijkstraModel.distant));
+
+            this.setState({
+                actionMatrix: actionMatrixCopy.slice(0)
+            });
+
+            await delay(10);
         }
     }
 
     private paintPath = (path: Array<Point>): void => {
 
-        const actionMatrixCopy: Array<Array<SquareModel>> = this.getCleanPathMatrix();
+        const actionMatrixCopy: Array<Array<SquareModel>> = this.state.actionMatrix.slice(0);
 
         for (let pathPosition of path) {
             const squareModelAux: SquareModel = actionMatrixCopy[pathPosition.col][pathPosition.row];
-            actionMatrixCopy[pathPosition.col][pathPosition.row] = new SquareModel(squareModelAux.action, true);
+            actionMatrixCopy[pathPosition.col][pathPosition.row] = new SquareModel(squareModelAux.action, 'blue');
         }
 
         this.setState({
@@ -143,11 +163,19 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
         for (let colPosition = 0; colPosition < actionMatrixCopy.length; ++colPosition) {
             for (let rowPosition = 0; rowPosition < actionMatrixCopy[colPosition].length; ++rowPosition) {
                 const squareModelAux: SquareModel = actionMatrixCopy[colPosition][rowPosition];
-                actionMatrixCopy[colPosition][rowPosition] = new SquareModel(squareModelAux.action, false);
+                actionMatrixCopy[colPosition][rowPosition] = new SquareModel(squareModelAux.action, null);
             }
         }
 
         return actionMatrixCopy;
+    }
+
+    private static getColorByDistant(distant: number): string {
+        if (distant < 6) return 'green';
+        if (distant < 12) return 'yellow';
+        if (distant < 18) return 'orange';
+
+        return 'red';
     }
 
     render = (): ReactElement => {
