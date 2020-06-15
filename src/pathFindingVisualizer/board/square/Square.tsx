@@ -4,10 +4,11 @@ import {faArrowRight, faBullseye, faEraser, faPencilAlt} from "@fortawesome/free
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ActionEnum} from "../../../share/enum/ActionEnum";
 import {Point} from "../../../share/model/Point";
+import {SquareModel} from "../../../share/model/SquareModel";
 
 export interface ISquareProps {
     actionSelected: ActionEnum;
-    action: ActionEnum;
+    squareModel: SquareModel;
     isClicked: boolean;
     position: Point;
     onMouseDown: () => void;
@@ -31,7 +32,9 @@ export class Square extends Component<ISquareProps, ISquareState>{
 
     private getBackgroundColor = (): string => {
 
-        switch (this.props.action) {
+        if (this.props.squareModel.isPath) return 'orange';
+
+        switch (this.props.squareModel.action) {
             case ActionEnum.wall:
                 return 'black';
             case ActionEnum.clean:
@@ -46,8 +49,8 @@ export class Square extends Component<ISquareProps, ISquareState>{
     private showHoverIcon = (): ReactElement | null => {
 
         if (!this.state.isHovered
-            || this.props.action === ActionEnum.start
-            || this.props.action === ActionEnum.end) return null;
+            || this.props.squareModel.action === ActionEnum.start
+            || this.props.squareModel.action === ActionEnum.end) return null;
 
         switch (this.props.actionSelected) {
             case ActionEnum.wall:
@@ -84,7 +87,7 @@ export class Square extends Component<ISquareProps, ISquareState>{
     }
 
     private showIcon = (): ReactElement | null => {
-        switch (this.props.action) {
+        switch (this.props.squareModel.action) {
             case ActionEnum.start:
                 return (<FontAwesomeIcon icon={faArrowRight} />);
             case ActionEnum.end:
