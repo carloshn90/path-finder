@@ -1,4 +1,4 @@
-# Dijkstra's algorithm
+# [Dijkstra's algorithm](https://carloshn90.github.io/path-finder/)
 
 ### 1ª Simulation
 ![first-simulation](public/first-simulation.png "first simulation")
@@ -8,6 +8,9 @@
 
 ### 3ª Simulation
 ![third-simulation](public/third-simulatio.png "third simulation")
+
+## Example
+[Try me here!](https://carloshn90.github.io/path-finder/)
 
 ## Available Scripts
 
