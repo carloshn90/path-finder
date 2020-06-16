@@ -5,7 +5,7 @@ import "./Board.css"
 import {ActionEnum} from "../../share/enum/ActionEnum";
 import {Point} from "../../share/model/Point";
 import {SquareModel} from "../../share/model/SquareModel";
-
+import { v4 as uuidv4 } from "uuid";
 
 export interface IBoardProps {
     actionSelected: ActionEnum;
@@ -24,6 +24,7 @@ export class Board extends Component<IBoardProps, IBoardState> {
 
     private renderSquare = (colIndex: number, rowIndex: number, squareModel: SquareModel): ReactElement => {
         return <Square
+            key={uuidv4()}
             actionSelected={this.props.actionSelected}
             position={new Point(colIndex, rowIndex)}
             squareModel={squareModel}
@@ -45,7 +46,7 @@ export class Board extends Component<IBoardProps, IBoardState> {
                 rowIndex += 1;
             }
             colIndex += 1;
-            elementArray.push(<div className="board-row" key={colIndex}>{colElementArray}</div>);
+            elementArray.push(<div className="board-row" key={uuidv4()}>{colElementArray}</div>);
         }
 
         return elementArray;
@@ -53,7 +54,7 @@ export class Board extends Component<IBoardProps, IBoardState> {
 
     render = (): ReactElement => {
         return (
-            <div>
+            <div className="board">
                 {this.createBoard(this.props.actionMatrix)}
             </div>
         );

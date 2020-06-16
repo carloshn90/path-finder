@@ -20,7 +20,7 @@ export class Dijkstra {
 
 
         do {
-            this.visited.add(Dijkstra.createNodeKey(currentNode));
+            this.visited.add(currentNode.id);
             const distant: number = isNil(currentNode.distant) ? 0 : currentNode.distant;
             const currentDijkstra: DijkstraModel = new DijkstraModel(currentNode, null, distant);
             this.dijkstraModelArray.push(currentDijkstra);
@@ -41,7 +41,6 @@ export class Dijkstra {
 
         for (let childTreeNode of currentNode.childArray) {
             if (!this.hasVisited(childTreeNode)) {
-                console.log('current distant: ', currentDijkstra.distant);
                 childTreeNode.distant = currentDijkstra.distant + 1;
                 this.updateDijkstraModelArray(childTreeNode, currentNode, childTreeNode.distant);
             }
@@ -62,7 +61,7 @@ export class Dijkstra {
 
     private getNextNotVisitedNode = (): TreeNode | null => {
         const notVisitedNodeArray: Array<DijkstraModel> = this.dijkstraModelArray
-            .filter(dijkstra => !this.visited.has(Dijkstra.createNodeKey(dijkstra.currentNode)));
+            .filter(dijkstra => !this.visited.has(dijkstra.currentNode.id));
 
         if (isEmpty(notVisitedNodeArray)) return null;
 
@@ -71,7 +70,7 @@ export class Dijkstra {
 
     private hasVisited = (node: TreeNode): boolean => {
 
-        const nodeKey: string = Dijkstra.createNodeKey(node);
+        const nodeKey: string = node.id;
 
         return this.visited.has(nodeKey);
     }
@@ -97,10 +96,5 @@ export class Dijkstra {
         if (isNil(currentNode)) return undefined;
 
         return this.dijkstraModelArray.find(dijkstra => dijkstra.currentNode === currentNode)
-    }
-
-
-    private static createNodeKey = (node: TreeNode): string => {
-        return "" + node.position.col + node.position.row;
     }
 }

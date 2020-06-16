@@ -19,6 +19,9 @@ export interface IPathFindingVisualizerState {
     actionMatrix: Array<Array<SquareModel>>;
     startPosition: Point | null;
     endPosition: Point | null;
+    speed: number;
+    steps: number;
+    isPlaying: boolean;
 }
 
 export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps, IPathFindingVisualizerState>{
@@ -30,7 +33,10 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
             isClicked: false,
             actionMatrix: this.createActionMatrix(20, 30),
             startPosition: null,
-            endPosition: null
+            endPosition: null,
+            speed: 0,
+            steps: 0,
+            isPlaying: false
         };
     }
 
@@ -115,6 +121,10 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
 
     private executeDijkstraAlgorithm = (): void => {
 
+        if (this.state.isPlaying) return;
+
+        this.setState({isPlaying: true})
+
         const initPosition: Point | null = this.state.startPosition;
         if (!isNil(initPosition)) {
             const treeNodeArray: Array<TreeNode> = new TreeUtil().matrixToTree(this.state.actionMatrix, initPosition);
@@ -127,6 +137,7 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
     private paintSimulation = async (dijkstraStepResults: Array<DijkstraModel>): Promise<void> => {
 
         let actionMatrixCopy: Array<Array<SquareModel>> = this.getCleanPathMatrix();
+        this.setState({steps: 0});
         const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
         for (let dijkstraModel of dijkstraStepResults) {
@@ -136,10 +147,12 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
                 new SquareModel(squareModelAux.action, PathFindingVisualizer.getColorByDistant(dijkstraModel.distant));
 
             this.setState({
-                actionMatrix: actionMatrixCopy.slice(0)
+                actionMatrix: actionMatrixCopy.slice(0),
+                steps: this.state.steps + 1
             });
 
-            await delay(10);
+            if (this.state.speed > 1)
+                await delay(this.state.speed);
         }
     }
 
@@ -153,7 +166,8 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
         }
 
         this.setState({
-            actionMatrix: actionMatrixCopy
+            actionMatrix: actionMatrixCopy,
+            isPlaying: false
         });
     }
 
@@ -188,10 +202,14 @@ export class PathFindingVisualizer extends Component<IPathFindingVisualizerProps
 
                             <div className="col-12">
                                 <div className="row">
-                                    <h1 className="text-center title">Path finder</h1>
+                                    <h1 className="text-center title">Dijkstra</h1>
                                 </div>
                                 <div className="row">
                                     <ToolPanel
+                                        speed={this.state.speed}
+                                        steps={this.state.steps}
+                                        isPlaying={this.state.isPlaying}
+                                        onSpeedChange={(value: number) => this.setState({speed: value})}
                                         onAction={(action: ActionEnum) => this.setActionState(action)}
                                         onPlay={() => this.executeDijkstraAlgorithm()}
                                     >

@@ -24,10 +24,10 @@ export class TreeUtil {
             const node: TreeNode | undefined = this.fifoStack.shift();
             if (!isNil(node)) {
                 const position: Point = node.position;
-                const rightNode: TreeNode | undefined = this.createTreeNode(matrix, position.col, position.row - 1);
-                const leftNode: TreeNode | undefined = this.createTreeNode(matrix, position.col, position.row + 1);
-                const upNode: TreeNode | undefined = this.createTreeNode(matrix, position.col - 1, position.row);
-                const downNode: TreeNode | undefined = this.createTreeNode(matrix, position.col + 1, position.row);
+                const rightNode: TreeNode | null = this.createTreeNode(matrix, position.col, position.row - 1);
+                const leftNode: TreeNode | null = this.createTreeNode(matrix, position.col, position.row + 1);
+                const upNode: TreeNode | null = this.createTreeNode(matrix, position.col - 1, position.row);
+                const downNode: TreeNode | null = this.createTreeNode(matrix, position.col + 1, position.row);
 
                 TreeUtil.addToFatherNode(node, rightNode, leftNode, upNode, downNode);
                 this.addNodesQueue(rightNode, leftNode, upNode, downNode);
@@ -38,25 +38,33 @@ export class TreeUtil {
         return nodeTree;
     }
 
-    private createTreeNode = (matrix: Array<Array<SquareModel>>, col: number, row: number): TreeNode | undefined => {
+    private createTreeNode = (matrix: Array<Array<SquareModel>>, col: number, row: number): TreeNode | null => {
 
-        const colRowKey: string = "" + col + row;
-        if (this.positionChecked.has(colRowKey)) return undefined;
 
-        this.positionChecked.add(colRowKey);
+        if (col < 0 || col >= (matrix.length)) return null;
+        if (row < 0 || row >= (matrix[col].length))  return null;
+
+
         try {
-            const action: ActionEnum | undefined = matrix[col][row].action;
+            const squreModel: SquareModel = matrix[col][row];
 
-            if (isNil(action) || action === ActionEnum.start || action === ActionEnum.wall) return undefined;
+            if (this.positionChecked.has(squreModel.id)) return null;
+            this.positionChecked.add(squreModel.id);
 
-            return new TreeNode(new Point(col, row), [], action === ActionEnum.end, null);
+            if (isNil(squreModel.action) || squreModel.action === ActionEnum.start || squreModel.action === ActionEnum.wall) {
+                console.log("wall");
+                return null;
+            }
+
+            return new TreeNode(new Point(col, row), [], squreModel.action === ActionEnum.end, null);
         } catch (e) {
-            return undefined;
+            console.log("Errror: ", col);
+            return null;
         }
     }
 
-    private addNodesQueue = (rightNode: TreeNode | undefined, leftNode: TreeNode | undefined,
-                          upNode: TreeNode | undefined, downNode: TreeNode | undefined) => {
+    private addNodesQueue = (rightNode: TreeNode | null, leftNode: TreeNode | null,
+                          upNode: TreeNode | null, downNode: TreeNode | null) => {
 
         if (!isNil(rightNode)) this.fifoStack.push(rightNode);
         if (!isNil(leftNode)) this.fifoStack.push(leftNode);
@@ -64,8 +72,8 @@ export class TreeUtil {
         if (!isNil(downNode)) this.fifoStack.push(downNode);
     }
 
-    private static addToFatherNode = (fatherNode: TreeNode, rightNode: TreeNode | undefined,
-                                   leftNode: TreeNode | undefined, upNode: TreeNode | undefined, downNode: TreeNode | undefined) => {
+    private static addToFatherNode = (fatherNode: TreeNode, rightNode: TreeNode | null,
+                                   leftNode: TreeNode | null, upNode: TreeNode | null, downNode: TreeNode | null) => {
 
         if (!isNil(rightNode)) fatherNode.childArray.push(rightNode);
         if (!isNil(leftNode)) fatherNode.childArray.push(leftNode);
