@@ -1,4 +1,5 @@
 {
+  "homepage": "https://carloshn90.github.io/path-finder/",
   "name": "path-finder",
   "version": "0.1.0",
   "private": true,
@@ -28,7 +29,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,6 +50,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.155",
-    "@types/uuid": "^8.0.0"
+    "@types/uuid": "^8.0.0",
+    "gh-pages": "^3.0.0"
   }
 }
