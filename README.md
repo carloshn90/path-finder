@@ -1,4 +1,13 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Dijkstra's algorithm
+
+### 1ª Simulation
+![first-simulation](public/first-simulation.png "first simulation")
+
+### 2ª Simulation
+![second-simulation](public/second-simulation.png "second simulation")
+
+### 3ª Simulation
+![third-simulation](public/third-simulatio.png "third simulation")
 
 ## Available Scripts
 
